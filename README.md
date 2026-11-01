@@ -4,14 +4,9 @@ A React, TypeScript, and Vite assessment demo for reviewing orders and processin
 
 **Tech stack:** React, TypeScript, Vite, Tailwind CSS v4, Radix UI, Lucide React, native fetch, MSW, Vitest, and React Testing Library.
 
-## Live Demo
-
-[View Live Application](https://zus-refund-app-assessment.vercel.app)
-
-[View Live Application (API Demo tools)](https://zus-refund-app-assessment.vercel.app/?demoTools=1)
-
 ## Contents
 
+- [Live demo](#live-demo)
 - [Run locally](#run-locally)
 - [Technical Design & Considerations](#technical-design--considerations)
 - [Application Screenshots](#application-screenshots)
