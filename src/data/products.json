@@ -1,0 +1,19 @@
+{
+  "products": [
+    {
+      "id": "SL1",
+      "name": "Iced Spanish Latte",
+      "image_path": "https://zuscoffee.com/wp-content/uploads/2024/01/Website_SKU-ISL.png"
+    },
+    {
+      "id": "HA1",
+      "name": "Hazelnut Americano",
+      "image_path": "https://zuscoffee.com/wp-content/uploads/2022/05/Americano.png"
+    },
+    {
+      "id": "BC1",
+      "name": "Butter Croissant",
+      "image_path": "https://croisserie.com.my/cdn/shop/files/croisserie-croissant-au-beurre.png?v=1767529761"
+    }
+  ]
+}

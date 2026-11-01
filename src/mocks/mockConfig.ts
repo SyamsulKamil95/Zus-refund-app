@@ -1,7 +1,7 @@
 export const demoMode = import.meta.env.VITE_DEMO_MODE !== 'false'
 
 export function showDemoTools(search: string): boolean {
-  return demoMode && (import.meta.env.DEV || new URLSearchParams(search).get('demoTools') === '1')
+  return demoMode && import.meta.env.DEV && (new URLSearchParams(search).get('demoTools') === '1')
 }
 
 interface MockScenario { latencyMs: number; failNextRefund: boolean }

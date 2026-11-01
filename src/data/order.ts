@@ -32,6 +32,7 @@ function isUnit(value: unknown): value is OrderUnit {
 function isOrderItem(value: unknown): value is OrderItem {
   return isRecord(value) &&
     typeof value.line_id === 'string' &&
+    typeof value.base_product_id === 'string' &&
     typeof value.name === 'string' &&
     isMoney(value.unit_price) &&
     Array.isArray(value.units) &&

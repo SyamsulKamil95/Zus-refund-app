@@ -17,6 +17,7 @@ export interface OrderUnit {
 
 export interface OrderItem {
   line_id: string
+  base_product_id: string
   name: string
   unit_price: number
   units: OrderUnit[]

@@ -1,4 +1,5 @@
-import { PackageOpen, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { ProductImage } from '../../../components/ui/ProductImage'
 import type { OrderAddOn, OrderItem } from '../types/order.types'
 import { formatMoney, getItemSubtotalCents } from '../utils/orderCalculator'
 import { StatusBadge } from './StatusBadge'
@@ -7,6 +8,7 @@ type OrderItemCardProps = {
   item: OrderItem
   currency: 'MYR'
   displayIndex: number
+  imageSrc?: string
 }
 
 function getDistinctAddOns(item: OrderItem): OrderAddOn[] {
@@ -19,14 +21,14 @@ function getDistinctAddOns(item: OrderItem): OrderAddOn[] {
   return [...distinct.values()]
 }
 
-export function OrderItemCard({ item, currency, displayIndex }: OrderItemCardProps) {
+export function OrderItemCard({ item, currency, displayIndex, imageSrc }: OrderItemCardProps) {
   const lineTotal = getItemSubtotalCents(item) / 100
   const distinctAddOns = getDistinctAddOns(item)
 
   return (
     <article className="order-item-card" aria-labelledby={`item-title-${item.line_id}`}>
       <div className="item-card-main">
-        <div className={`product-symbol product-symbol-${displayIndex}`}><PackageOpen size={22} strokeWidth={1.65} aria-hidden="true" /></div>
+        <div className={`product-symbol product-symbol-${displayIndex}`}><ProductImage src={imageSrc} name={item.name} /></div>
         <div className="product-main-copy">
           <div className="item-line-label text-caption">LINE {item.line_id}</div>
           <h3 id={`item-title-${item.line_id}`} className="text-product">{item.name}</h3>

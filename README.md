@@ -45,6 +45,7 @@ React components / hooks
 ```
 
 - `src/data/order.json` is the unchanged source fixture. `src/data/order.ts` validates its shape and exposes that validator for HTTP responses.
+- `src/data/products.json` supplies product images. The typed lookup in `src/data/products.ts` matches each order item's `base_product_id` to the catalog's `id`; order names, prices, and statuses still come from the fetched order. Missing catalog entries and failed image loads retain the product icon. Remote images use anonymous CORS requests for compatibility with the demo's service worker; their host must allow CORS, as the supplied ZUS image host does. The current catalog uses the same image URL for all three products, so their thumbnails match until the source URLs are updated.
 - `src/features/order` contains order types, display components, total/formatting utilities, the versioned store primitive, and the GET-loading hook.
 - `src/features/refund` contains the pure calculator/validators, selection reducer, selection/review/confirmation components, and submission hook.
 - `src/services/orderApi.ts` implements the existing `OrderApi` contract. Both methods use native `fetch()`, parse JSON, check HTTP status, and convert errors into typed `ApiError` values. React hooks do not call the mock store directly. No Axios dependency is used.
@@ -254,4 +255,4 @@ README.md
 QA_REPORT.md
 ```
 
-The source fixture was subsequently updated by the project owner with `order_date`. Its current SHA-256 is `379D806EBDDF9A242396A4B6C6E06452396BF40FC527854A630A750DE7A3FE60`; the historical QA report records the earlier fixture hash. The theme/date changes do not modify this source file. The pure refund calculator and its 17 tests were not rewritten.
+The source fixture was subsequently updated by the project owner with `order_date` and item-level `base_product_id` values. Its current SHA-256 is `9C6301DE9B0303C2DFAF2469CB16F9174D65FC9B260944BAB018291ABA7125EB`; the historical QA report records an earlier fixture hash. The theme, date-display, and product-image implementations do not modify this source file. The pure refund calculator and its 17 tests were not rewritten.

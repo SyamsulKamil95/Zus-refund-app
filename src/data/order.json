@@ -8,6 +8,7 @@
   "items": [
     {
       "line_id": "L1",
+      "base_product_id": "SL1",
       "name": "Iced Spanish Latte",
       "unit_price": 13.90,
       "units": [
@@ -29,6 +30,7 @@
     },
     {
       "line_id": "L2",
+      "base_product_id": "HA1",
       "name": "Hazelnut Americano with Oat Milk and Brown Sugar Syrup",
       "unit_price": 11.90,
       "units": [
@@ -52,6 +54,7 @@
     },
     {
       "line_id": "L3",
+      "base_product_id": "BC1",
       "name": "Butter Croissant",
       "unit_price": 7.90,
       "units": [

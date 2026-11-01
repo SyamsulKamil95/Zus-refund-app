@@ -1,3 +1,4 @@
+import { getProductById } from '../../../data/products'
 import type { OrderJson } from '../types/order.types'
 import { OrderItemCard } from './OrderItemCard'
 
@@ -15,7 +16,7 @@ export function OrderItems({ order }: OrderItemsProps) {
       </div>
       <div className="order-items-list">
         {order.items.map((item, index) => (
-          <OrderItemCard item={item} currency={order.currency} displayIndex={index + 1} key={item.line_id} />
+          <OrderItemCard item={item} currency={order.currency} imageSrc={getProductById(item.base_product_id)?.image_path} displayIndex={index + 1} key={item.line_id} />
         ))}
       </div>
     </section>
