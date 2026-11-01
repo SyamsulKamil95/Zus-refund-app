@@ -95,7 +95,7 @@ function RefundFlow({ order, api, onRequestConfirmation, onSuccess }: Pick<Refun
     >
       <header className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-4 sm:px-6">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-700">Order {order.order_id} · Step {isReview ? '2' : '1'} of 2</p>
+          <p className="text-detail font-semibold uppercase tracking-[0.1em] text-brand-700">Order {order.order_id} · Step {isReview ? '2' : '1'} of 2</p>
           <Dialog.Title className="mt-1 text-xl font-bold tracking-tight text-slate-900">Initiate Refund</Dialog.Title>
           <Dialog.Description className="mt-1 max-w-xl text-sm leading-5 text-slate-500">
             {isReview ? 'Review the selected items, then choose a refund reason and channel.' : 'Select paid units to refund. Add-ons are optional and can only be selected with their unit.'}
@@ -115,7 +115,7 @@ function RefundFlow({ order, api, onRequestConfirmation, onSuccess }: Pick<Refun
           </h2>
           {!isReview && <p className="mt-1 text-xs text-slate-500">Choose units individually. Add-ons are not selected automatically.</p>}
         </div>
-        <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">{order.currency}</span>
+        <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-detail font-semibold text-slate-500">{order.currency}</span>
       </div>
 
       <div ref={bodyRef} className="refund-modal-body min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6">
@@ -149,18 +149,18 @@ function RefundFlow({ order, api, onRequestConfirmation, onSuccess }: Pick<Refun
         {total ? <RefundSummary selection={state.selection} total={total} /> : <p className="text-sm text-red-700">Refund total unavailable. Update your selection.</p>}
         <div className="flex justify-end gap-2">
           {isReview ? (
-            <button type="button" disabled={Boolean(confirmationRequest)} onClick={() => dispatch({ type: 'back' })} className="refund-secondary-button inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
+            <button type="button" disabled={Boolean(confirmationRequest)} onClick={() => dispatch({ type: 'back' })} className="refund-secondary-button text-body inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
               <ArrowLeft size={15} aria-hidden="true" /> Back
             </button>
           ) : (
             <Dialog.Close asChild>
-              <button type="button" className="refund-secondary-button min-h-11 rounded-lg border border-slate-300 bg-white px-4 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Cancel</button>
+              <button type="button" className="refund-secondary-button text-body min-h-11 rounded-lg border border-slate-300 bg-white px-4 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Cancel</button>
             </Dialog.Close>
           )}
           {isReview ? (
-            <button key="confirm" ref={reviewConfirmRef} disabled={Boolean(confirmationRequest)} type="submit" form="refund-review-form" className="refund-primary-button inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-800 px-4 transition hover:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Confirm Refund</button>
+            <button key="confirm" ref={reviewConfirmRef} disabled={Boolean(confirmationRequest)} type="submit" form="refund-review-form" className="refund-primary-button text-body inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-800 px-4 transition hover:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Confirm Refund</button>
           ) : (
-            <button key="next" type="button" onClick={(event) => { event.preventDefault(); handleNext() }} disabled={selectionErrors.length > 0} className="refund-primary-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 transition hover:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300">
+            <button key="next" type="button" onClick={(event) => { event.preventDefault(); handleNext() }} disabled={selectionErrors.length > 0} className="refund-primary-button text-body inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 transition hover:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300">
               Next <ArrowRight size={15} aria-hidden="true" />
             </button>
           )}

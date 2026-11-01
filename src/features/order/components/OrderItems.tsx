@@ -8,10 +8,10 @@ export function OrderItems({ order }: OrderItemsProps) {
     <section className="items-section" aria-labelledby="items-heading">
       <div className="section-heading-row">
         <div>
-          <p className="section-eyebrow">PURCHASE BREAKDOWN</p>
-          <h2 id="items-heading">Order items <span>{order.items.length}</span></h2>
+          <p className="section-eyebrow text-caption">PURCHASE BREAKDOWN</p>
+          <h2 id="items-heading" className="text-heading">Order items <span className="text-detail">{order.items.length}</span></h2>
         </div>
-        <p className="items-units-total">{order.items.reduce((total, item) => total + item.units.length, 0)} units in this order</p>
+        <p className="items-units-total text-label max-[600px]:text-detail">{order.items.reduce((total, item) => total + item.units.length, 0)} units in this order</p>
       </div>
       <div className="order-items-list">
         {order.items.map((item, index) => (

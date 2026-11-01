@@ -27,7 +27,7 @@ export function RefundUnitRow({
   const unitCheckboxId = `refund-unit-${unit.unit_id}`
 
   return (
-    <li className={`rounded-lg border p-3 ${isRefunded ? 'border-orange-100 bg-orange-50/60' : 'border-slate-200 bg-slate-50/70'}`}>
+    <li className={`rounded-lg border p-3 transition-colors ${isRefunded ? 'border-orange-100 bg-orange-50/60' : isSelected ? 'border-brand-200 bg-brand-50/60' : 'border-slate-200 bg-slate-50/70'}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <label
           htmlFor={unitCheckboxId}
@@ -86,7 +86,7 @@ export function RefundUnitRow({
                     <span className="text-xs font-medium text-slate-700">{formatMoney(addOn.unit_price, currency)}</span>
                   </label>
                   {disabledReason && (
-                    <p id={`${checkboxId}-help`} className={`mt-1 flex items-center gap-1 text-[11px] ${isRefunded ? 'font-medium text-orange-900' : 'text-slate-500'}`}>
+                    <p id={`${checkboxId}-help`} className={`mt-1 flex items-center gap-1 text-detail ${isRefunded ? 'font-medium text-orange-900' : 'text-slate-500'}`}>
                       {isRefunded && <LockKeyhole size={12} aria-hidden="true" />} {disabledReason}
                     </p>
                   )}

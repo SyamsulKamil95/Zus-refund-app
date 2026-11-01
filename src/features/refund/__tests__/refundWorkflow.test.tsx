@@ -47,6 +47,7 @@ describe('refund confirmation and submission workflow', () => {
     await user.dblClick(within(confirmation).getByRole('button', { name: 'Confirm Refund' }))
     await waitFor(() => expect(post).toHaveBeenCalledTimes(1))
     expect(within(confirmation).getByRole('button', { name: 'Submitting refund…' })).toBeDisabled()
+    expect(confirmation).toHaveFocus()
     expect(within(confirmation).getByRole('button', { name: 'Cancel' })).toBeDisabled()
     expect(screen.queryByText(/completed successfully/)).not.toBeInTheDocument()
     expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })

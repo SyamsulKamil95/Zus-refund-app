@@ -4,6 +4,7 @@ import { order } from '../../../data/order'
 import { server } from '../../../mocks/node'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import App from '../../../app/App'
 import OrderPage from './OrderPage'
 
 describe('OrderPage', () => {
@@ -14,7 +15,10 @@ describe('OrderPage', () => {
       await pending
       return HttpResponse.json({ order, version: 0 })
     }))
-    render(<OrderPage />)
+    render(<App />)
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Operations Back Office')
+    expect(within(screen.getByRole('main')).getByRole('heading', { name: 'Order details' })).toBeInTheDocument()
     expect(screen.getByText('Loading order details…')).toBeInTheDocument()
     expect(screen.queryByText('Iced Spanish Latte')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Refund' })).not.toBeInTheDocument()

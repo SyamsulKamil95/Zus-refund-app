@@ -13,18 +13,18 @@ export function OrderSummary({ order, onStartRefund, refundButtonRef }: OrderSum
     <aside className="order-summary" aria-labelledby="summary-heading">
       <div className="summary-title-row">
         <span className="summary-icon"><ReceiptText size={17} aria-hidden="true" /></span>
-        <div><p className="section-eyebrow">PAYMENT OVERVIEW</p><h2 id="summary-heading">Order summary</h2></div>
+        <div><p className="section-eyebrow text-caption">PAYMENT OVERVIEW</p><h2 id="summary-heading" className="text-section max-[600px]:text-section-sm">Order summary</h2></div>
       </div>
       <div className="summary-lines">
-        <div className="summary-line"><span>Product subtotal</span><strong>{formatMoney(totals.subtotal, order.currency)}</strong></div>
-        <div className="summary-line delivery-line">
+        <div className="summary-line text-label"><span>Product subtotal</span><strong className="text-note">{formatMoney(totals.subtotal, order.currency)}</strong></div>
+        <div className="summary-line delivery-line text-label">
           <span>Delivery fee <StatusBadge status={order.delivery_fee_status} compact /></span>
-          <strong>{formatMoney(totals.deliveryFee, order.currency)}</strong>
+          <strong className="text-note">{formatMoney(totals.deliveryFee, order.currency)}</strong>
         </div>
       </div>
-      <div className="summary-total-line"><span>Total order amount</span><strong>{formatMoney(totals.total, order.currency)}</strong></div>
-      <div className="summary-footnote"><CircleHelp size={14} aria-hidden="true" /><span>Amounts include add-ons at their per-unit prices.</span></div>
-      <button ref={refundButtonRef} className="refund-button" type="button" onClick={onStartRefund}>
+      <div className="summary-total-line text-note"><span>Total order amount</span><strong className="text-total">{formatMoney(totals.total, order.currency)}</strong></div>
+      <div className="summary-footnote text-detail"><CircleHelp size={14} aria-hidden="true" /><span>Amounts include add-ons at their per-unit prices.</span></div>
+      <button ref={refundButtonRef} className="refund-button text-body" type="button" onClick={onStartRefund}>
         <ArrowDownToLine size={16} aria-hidden="true" /> Refund
       </button>
     </aside>

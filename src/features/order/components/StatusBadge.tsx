@@ -16,7 +16,7 @@ export function StatusBadge({ status, compact = false }: StatusBadgeProps) {
   const Icon = status === 'refunded' ? RotateCcw : status === 'completed' ? BadgeCheck : CircleDollarSign
 
   return (
-    <span className={`status-badge status-${status}${compact ? ' status-compact' : ''}`}>
+    <span className={`status-badge status-${status} ${compact ? 'status-compact text-caption' : 'text-label'}`}>
       <Icon size={compact ? 12 : 14} aria-hidden="true" />
       {statusLabels[status]}
     </span>

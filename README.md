@@ -27,7 +27,13 @@ npm run preview   # serves dist locally; no backend needed
 
 The default brand color is **#16277A**, sampled from the supplied reference. Shared Tailwind v4 `brand` palette tokens in `src/styles.css` style buttons, selection controls, focus states, summaries, and status badges throughout the app.
 
+Typography uses Tailwind `text-*` utilities throughout the components, including responsive variants. The `@theme` block in `src/styles.css` defines the shared scale: named utilities such as `text-caption`, `text-body`, `text-section`, and `text-page` preserve the dashboard's existing sizes alongside the refund flow's `text-xs`/`text-sm` scale. There are no component-specific `font-size` declarations or arbitrary pixel text utilities. To increase all app text by 2px, set `--app-font-size-adjustment: 2px` in `:root`; it defaults to `0px`. This adjusts every text token without changing the root size that controls rem-based spacing. Change an individual `--text-*` theme token to adjust one typography role throughout the app.
+
 The optional ISO `order_date` is validated in the data layer and displayed from the fetched order as a semantic `time` element. Formatting uses `en-MY` and `Asia/Kuala_Lumpur`, with an explicit MYT label. Orders without a date retain the "Not provided" fallback.
+
+`src/components/layout/AppLayout.tsx` accepts React children and owns the shared header, skip link, main content container, and footer. `src/app/App.tsx` renders `<AppLayout><OrderPage /></AppLayout>`, keeping page content and refund state in `OrderPage`. `AppFooter.tsx` uses the existing logo and a dynamic year. The layout uses a minimum-height flex column; the footer follows `main` in normal document flow, including after demo tools. Header, main, and footer share a centered 1220px container. Existing brand tokens are supplemented by small surface, radius, border, and shadow tokens in `src/styles.css`. Metadata, item details, badges, and totals use a readable compact type scale, with reduced-motion support and navy focus/selection states.
+
+The UI polish was visually checked in the Chromium in-app browser at 1440×900, 1024×768, 768×1024, 1280×600, and 390×844 across the page, selection, review, and confirmation views. The footer adapts to stacked mobile content, the summary stacks below 900px, and dialog bodies scroll independently of their actions. A production-preview failure/retry journey confirmed HTTP 503 preserves the draft and HTTP 201 triggers GET refresh with the historical total unchanged. Pending submission keeps focus on the confirmation dialog while buttons are disabled; the existing integration test covers this. Screen-reader speech and other browser engines still require manual acceptance checks.
 
 ```text
 React components / hooks

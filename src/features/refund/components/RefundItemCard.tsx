@@ -24,7 +24,7 @@ export function RefundItemCard({
     <section className="overflow-hidden rounded-xl border border-slate-200 bg-white" aria-labelledby={`refund-item-${item.line_id}`}>
       <header className="flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 px-4 py-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Line {item.line_id} · Qty {item.units.length}</p>
+          <p className="text-detail font-semibold uppercase tracking-wider text-slate-500">Line {item.line_id} · Qty {item.units.length}</p>
           <h3 id={`refund-item-${item.line_id}`} className="mt-1 text-sm font-semibold leading-5 text-slate-800">{item.name}</h3>
         </div>
         <span className="shrink-0 text-xs font-medium text-slate-600">{formatMoney(item.unit_price, currency)} / unit</span>

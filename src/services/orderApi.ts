@@ -1,3 +1,4 @@
+import { ERROR_MESSAGE } from '../constant/constant'
 import { isOrderJson } from '../data/order'
 import type { OrderSnapshot } from '../features/order/state/orderStore'
 import { ApiError, type OrderApi, type RefundApiResponse } from './orderApi.types'
@@ -26,7 +27,7 @@ async function requestJson(url: URL, init: RequestInit, expectedStatus: 200 | 20
   try { data = await response.json() }
   catch {
     init.signal?.throwIfAborted()
-    throw new ApiError(response.status, 'INVALID_RESPONSE', 'The order service returned an invalid JSON response.')
+    throw new ApiError(response.status, 'INVALID_RESPONSE', ERROR_MESSAGE.SOMETHING_WENT_WRONG)
   }
   init.signal?.throwIfAborted()
   if (!response.ok) {

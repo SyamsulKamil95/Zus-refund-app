@@ -1,5 +1,10 @@
+import { AppLayout } from '../components/layout/AppLayout'
 import OrderPage from '../features/order/pages/OrderPage'
 
 export default function App() {
-  return <OrderPage />
+  return (
+    <AppLayout>
+      <OrderPage />
+    </AppLayout>
+  )
 }

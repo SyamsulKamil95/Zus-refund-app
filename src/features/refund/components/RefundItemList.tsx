@@ -49,7 +49,7 @@ export function RefundItemList({ order, selection, onUnitToggle, onAddOnToggle, 
                 <Truck size={15} aria-hidden="true" /> Delivery fee
               </span>
               <span className="mt-1 block text-xs text-slate-500">
-                {deliveryFeeIsRefunded ? 'Already refunded · not eligible' : 'Optional · select independently'}
+                {deliveryFeeIsRefunded ? 'Already refunded · not eligible' : 'Optional'}
               </span>
             </span>
           </label>

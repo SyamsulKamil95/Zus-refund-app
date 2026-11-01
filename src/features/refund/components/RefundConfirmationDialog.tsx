@@ -16,11 +16,13 @@ type RefundConfirmationDialogProps = {
 
 export function RefundConfirmationDialog({ request, api, onCancel, onSuccess, returnFocusRef }: RefundConfirmationDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const [requestId] = useState(() => crypto.randomUUID())
   const { submit, isSubmitting, error } = useRefundSubmission(api, onSuccess)
   const channel = refundChannels.find(({ value }) => value === request.channel)?.label
 
   function handleSubmit() {
+    contentRef.current?.focus({ preventScroll: true })
     void submit({
       requestId,
       orderId: request.orderId,
@@ -35,6 +37,7 @@ export function RefundConfirmationDialog({ request, api, onCancel, onSuccess, re
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-60 bg-slate-950/55" />
         <Dialog.Content
+          ref={contentRef}
           className="refund-dialog fixed left-1/2 top-1/2 z-70 flex max-h-[calc(100dvh-32px)] w-[min(480px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-clip rounded-2xl border border-slate-200 bg-white shadow-2xl focus:outline-none"
           onOpenAutoFocus={(event) => { event.preventDefault(); cancelRef.current?.focus() }}
           onCloseAutoFocus={(event) => { event.preventDefault(); returnFocusRef.current?.focus({ preventScroll: true }) }}
@@ -59,8 +62,8 @@ export function RefundConfirmationDialog({ request, api, onCancel, onSuccess, re
           </div>
           <footer className="flex shrink-0 justify-end gap-2 border-t border-slate-200 px-5 py-4">
             {isSubmitting && <span role="status" className="sr-only">Submitting refund. Please wait.</span>}
-            <button ref={cancelRef} type="button" onClick={onCancel} disabled={isSubmitting} className="refund-secondary-button min-h-11 rounded-lg border border-slate-300 px-4 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Cancel</button>
-            <button type="button" onClick={handleSubmit} disabled={isSubmitting} aria-busy={isSubmitting} className="refund-primary-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 hover:bg-brand-900 disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
+            <button ref={cancelRef} type="button" onClick={onCancel} disabled={isSubmitting} className="refund-secondary-button text-body min-h-11 rounded-lg border border-slate-300 px-4 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">Cancel</button>
+            <button type="button" onClick={handleSubmit} disabled={isSubmitting} aria-busy={isSubmitting} className="refund-primary-button text-body inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 hover:bg-brand-900 disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
               {isSubmitting && <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />}
               {isSubmitting ? 'Submitting refund…' : 'Confirm Refund'}
             </button>
