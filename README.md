@@ -16,6 +16,7 @@ Retrieves order details, including purchased items, individual units, add-ons, p
 ```json
 {
   "order_id": "ORD-10482",
+  "order_date": "2026-10-30T05:00:00.000Z", // New data field added to give more details on the order and necessary in the real world example,
   "status": "completed",
   "currency": "MYR",
   "delivery_fee": 5.00,
@@ -23,6 +24,7 @@ Retrieves order details, including purchased items, individual units, add-ons, p
   "items": [
     {
       "line_id": "L1",
+      "base_product_id": "SL1", // New data field added to give a unique id key for a particular product
       "name": "Iced Spanish Latte",
       "unit_price": 13.90,
       "quantity": 2,
