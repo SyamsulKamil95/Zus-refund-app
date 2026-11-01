@@ -1,3 +1,73 @@
+# ZUS - Regional Senior Frontend Developer:Technical Assessment(Refund Flow)
+
+A React, TypeScript, and Vite assessment demo for reviewing orders and processing mock refunds. Native `fetch()` requests are intercepted by Mock Service Worker (MSW), so no backend server or payment service is required.
+
+## Run locally
+
+### 1. Prerequisites and installation
+
+- Install **Node.js 22.12.0 or later** and npm.
+- Clone or download this repository, then open a terminal in the project root (the folder containing `package.json`).
+
+Install the dependencies using the committed lockfile:
+
+```sh
+npm ci
+```
+
+No environment file is required for the demo. MSW is enabled by default in both development and production preview. If you create `.env.local` from `.env.example`, keep `VITE_DEMO_MODE=true`. Setting it to `false` requires an available real backend configured through `VITE_API_BASE_URL`.
+
+On Windows PowerShell, if `npm` is blocked because `npm.ps1` cannot run, use `npm.cmd` for these commands, for example `npm.cmd ci` and `npm.cmd run dev`.
+
+### 2. Start the development server
+
+```sh
+npm run dev
+```
+
+Open the local URL printed in the terminal, normally [http://localhost:5173](http://localhost:5173). Vite may select another port if that port is occupied; use the printed URL. Source changes update automatically while the server is running.
+
+Press **Ctrl+C** in the terminal to stop the server.
+
+### 3. Enable and use demoTools
+
+With `npm run dev` running, add `?demoTools=1` to the app URL:
+
+[http://localhost:5173/?demoTools=1](http://localhost:5173/?demoTools=1)
+
+Use the actual development port if it differs. Scroll below the order items to find the **Demo API tools · MSW mock backend** panel, outside the refund dialogs.
+
+| Control | Behavior |
+|---|---|
+| Normal response (~1000 ms) | Simulates approximately one second of API latency. |
+| Slow response (~3000 ms) | Simulates approximately three seconds of API latency to inspect loading and disabled controls. |
+| Fail next refund request (HTTP 503) | Arms a deterministic failure for the next refund submission. Changing the control does not submit a refund or change order data. |
+
+To test failure and retry:
+
+1. Check **Fail next refund request (HTTP 503)** in the demo panel.
+2. Click **Refund**, select an eligible unit and any desired add-ons or delivery fee, then click **Next**.
+3. Choose a refund reason and channel. Click **Confirm Refund**, then submit from the final confirmation dialog.
+4. The API returns HTTP **503**, displays an error, and preserves the refund draft and order statuses.
+5. Retry from the confirmation dialog without arming another failure. A valid request succeeds with HTTP **201**, closes both dialogs, and refreshes the order through GET.
+
+The failure setting is consumed once, and subsequent requests return to normal latency. To test a successful slow response, select **Slow response** and leave the failure checkbox unchecked. Open browser DevTools → **Network → Fetch/XHR** to inspect the GET order and POST refund requests and their JSON responses.
+
+**Current visibility rule:** the panel requires both development mode and `?demoTools=1`. It is hidden without the parameter and is unavailable in production preview, even if the parameter is present. Reloading the app resets the in-memory mock order and scenarios; to retry a failed refund while preserving its draft, use the dialog instead of reloading.
+
+### 4. Build and run production preview
+
+Build the app first, then serve the generated `dist` folder:
+
+```sh
+npm run build
+npm run preview
+```
+
+Open the URL printed by the preview server, normally [http://localhost:4173](http://localhost:4173). MSW initializes before the app loads and intercepts API requests in preview too; refunds work without a backend. The worker script is included in the build.
+
+Preview serves the last production build and does not update source changes automatically. After changing source files, run `npm run build` again and reload the browser. Press **Ctrl+C** to stop preview. Running preview does not deploy the application.
+
 ## Technical Design & Considerations
 
 ### a) API Endpoints
