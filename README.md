@@ -83,6 +83,58 @@ Open the URL printed by the preview server, normally [http://localhost:4173](htt
 
 Preview serves the last production build and does not update source changes automatically. After changing source files, run `npm run build` again and reload the browser. Press **Ctrl+C** to stop preview. Running preview does not deploy the application.
 
+To use the same test panel in preview, open [http://localhost:4173/?demoTools=1](http://localhost:4173/?demoTools=1), using the port printed in the terminal.
+
+### 5. Run tests and quality checks
+
+```sh
+npm run test:run
+npm run typecheck
+npm run build
+npm run lint
+```
+
+`npm run test:run` runs the Vitest unit and React/HTTP integration tests once. `npm run test:watch` reruns tests as files change. Tests isolate their mock order state and use controlled delays.
+
+## Deployment to Vercel
+
+- **Live demo URL:** Pending deployment.
+- **Public GitHub repository URL:** Pending confirmation of the public repository.
+
+After reviewing and pushing the repository, import it into Vercel and use these settings:
+
+| Setting | Value |
+|---|---|
+| Framework preset | Vite |
+| Root directory | Repository root (`./`) |
+| Install command | `npm ci` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Node.js version | `24.x` |
+| Production branch | `master` (the current repository branch) |
+| Environment variable | `VITE_DEMO_MODE=true` in Production and Preview |
+| API base URL | Leave `VITE_API_BASE_URL` unset for the assessment demo |
+
+Vercel supports [Vite projects](https://vercel.com/docs/frameworks/frontend/vite) and [Node.js 24.x](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions). The app implements one page at `/` with no client-side routes, so it needs no `vercel.json`, SPA rewrites, or serverless functions. Keeping API paths free of HTML fallback rewrites also makes failures easier to diagnose.
+
+### Why MSW runs in the deployed demo
+
+This is a public assessment demo, not a payment system. Demo mode defaults to enabled; the explicit Vercel environment variable makes that intention clear. `src/main.tsx` awaits worker initialization before mounting React or making the first order request. A startup failure displays an error instead of mounting an application that would call an unavailable backend.
+
+Vite copies the committed `public/mockServiceWorker.js` into `dist/mockServiceWorker.js`. The worker is served at `/mockServiceWorker.js` on the deployed HTTPS origin. Keep it synchronized with the installed MSW version when upgrading MSW; the current file matches MSW 3.0.3. API clients use the deployed origin's `/api/` paths through native fetch. MSW handles GET, POST, validation, latency, failures, and the current in-memory order; unknown `/api/*` requests receive a mocked JSON 404.
+
+No backend URL or credentials are needed. All `VITE_*` values are public build-time client configuration, so never place secrets in them. For a future real backend integration, explicitly set `VITE_DEMO_MODE=false`, configure a real `VITE_API_BASE_URL`, and rebuild. Do not disable mocking for this backend-free assessment deployment.
+
+### Evaluate the deployed demo
+
+1. Open the deployed URL and Chrome DevTools → **Network → Fetch/XHR**, then reload. Inspect GET `/api/orders/ORD-10482` for HTTP **200** and JSON order data.
+2. Complete the selection, review, and final confirmation. Inspect POST `/api/orders/ORD-10482/refunds` for HTTP **201**, the success JSON, and `X-Order-Version`. A GET refresh updates only the selected statuses and preserves the historical purchase total.
+3. Add `?demoTools=1` to the deployed URL. Use **Slow response (~3000 ms)** to check loading and duplicate-submission protection. Use **Fail next refund request (HTTP 503)** to test a retained draft and successful retry. Changing the controls alone does not submit a refund.
+4. Verify the panel is hidden without the parameter, `/mockServiceWorker.js` serves JavaScript rather than HTML or a 404, and no worker or asset errors appear in the console.
+5. Hard-refresh the page. The mock order and scenarios reset to the supplied source data; they are not persisted or shared between users. Product images and Poppins load from external hosts, with icon and sans-serif fallbacks if unavailable.
+
+The actual Vercel deployment, public repository visibility, deployed browser Network responses, and HTTPS worker registration must be checked after deployment. Replace the URL placeholders only once those destinations are confirmed.
+
 ## Technical Design & Considerations
 
 ### a) API Endpoints
@@ -237,11 +289,6 @@ To maintain consistency, the frontend and mock backend reuse the same calculatio
 - The delivery fee can be refunded independently when its status is paid.
 - A full refund means selecting all remaining eligible units, their eligible add-ons, and the delivery fee.
 - Authentication, user roles, and payment gateway integration are outside the assessment scope.
-
-**Data inconsistencies:**
-
-- The supplied order data contains a refunded unit (`L2-2`) with add-ons still marked as paid. The implementation treats these add-ons as ineligible because their parent unit has already been refunded.
-- The supplied data supports a maximum remaining refundable amount of **RM59.00**, including the delivery fee. This differs from the **RM77.30** shown in the assessment screenshot. The implementation follows the supplied data and refund eligibility rules.
 
 **Questions for the PM or designer:**
 
