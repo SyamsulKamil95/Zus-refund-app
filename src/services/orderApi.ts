@@ -18,10 +18,10 @@ function isRefundResponse(value: unknown): value is RefundApiResponse {
     Number.isSafeInteger(Math.round(value.refundAmount * 100)) && Math.round(value.refundAmount * 100) / 100 === value.refundAmount
 }
 
-async function requestJson(url: URL, init: RequestInit, expectedStatus: 200 | 201): Promise<{ data: unknown; headers: Headers }> {
+async function requestJson(url: URL, init: RequestInit, expectedStatus: 200 | 201 | 400): Promise<{ data: unknown; headers: Headers }> {
   const response = await fetch(url, { cache: 'no-store', ...init })
   if (response.ok && response.status !== expectedStatus) {
-    throw new ApiError(response.status, 'UNEXPECTED_STATUS', `The order service returned HTTP ${response.status}; expected ${expectedStatus}.`)
+    throw new ApiError(response.status, 'UNEXPECTED_STATUS', ERROR_MESSAGE.SOMETHING_WENT_WRONG)
   }
   let data: unknown
   try { data = await response.json() }
