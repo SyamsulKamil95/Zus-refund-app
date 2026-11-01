@@ -1,6 +1,7 @@
 {
   "order_id": "ORD-10482",
   "status": "completed",
+  "order_date": "2026-10-30T05:00:00.000Z",
   "currency": "MYR",
   "delivery_fee": 5.00,
   "delivery_fee_status": "paid",

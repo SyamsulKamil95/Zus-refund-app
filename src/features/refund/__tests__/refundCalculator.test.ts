@@ -37,6 +37,10 @@ describe('refund calculation and validation', () => {
     expect(calculateRefundTotal(order, makeSelection(['L1-2', 'L2-1'])).amountMinorUnits).toBe(2580)
   })
 
+  it('calculates the supplied L3-1 unit as RM7.90', () => {
+    expect(calculateRefundTotal(order, makeSelection(['L3-1'])).amountMinorUnits).toBe(790)
+  })
+
   it('includes multiple selected add-ons from one unit', () => {
     const selection = makeSelection(['L2-1'], [
       { unitId: 'L2-1', addonId: 'A2' },
@@ -88,6 +92,38 @@ describe('refund calculation and validation', () => {
     const selection = makeSelection(['L1-2'], [{ unitId: 'L1-2', addonId: 'A1' }])
     expect(validateRefundSelection(order, selection).isValid).toBe(true)
     expect(calculateRefundTotal(order, selection).amountMinorUnits).toBe(1590)
+  })
+
+  it('keeps reused add-on IDs separate when both parent units are eligible', () => {
+    const updated = structuredClone(order)
+    updated.items[0].units[0].status = 'paid'
+    updated.items[0].units[0].addons[0].status = 'paid'
+    const selection = makeSelection(['L1-1', 'L1-2'], [{ unitId: 'L1-2', addonId: 'A1' }])
+    expect(calculateRefundTotal(updated, selection).amountMinorUnits).toBe(2980)
+    expect(calculateRefundTotal(updated, {
+      ...selection, selectedAddOns: [...selection.selectedAddOns, { unitId: 'L1-1', addonId: 'A1' }],
+    }).amountMinorUnits).toBe(3180)
+    expect(order.items[0].units[0].status).toBe('refunded')
+  })
+
+  it('rejects an already-refunded add-on even when its parent remains paid', () => {
+    const updated = structuredClone(order)
+    updated.items[0].units[1].addons[0].status = 'refunded'
+    const selection = makeSelection(['L1-2'], [{ unitId: 'L1-2', addonId: 'A1' }])
+    expect(getRefundableUnits(updated).find(({ unitId }) => unitId === 'L1-2')?.addOns).toEqual([])
+    expect(validateRefundSelection(updated, selection).errors).toContainEqual(expect.objectContaining({ code: 'addon-already-refunded' }))
+    expect(() => calculateRefundTotal(updated, selection)).toThrow(InvalidRefundSelectionError)
+  })
+
+  it('rejects ambiguous IDs in order data instead of charging an instance twice', () => {
+    const duplicateUnits = structuredClone(order)
+    duplicateUnits.items[2].units[0].unit_id = 'L1-2'
+    expect(validateRefundSelection(duplicateUnits, makeSelection(['L1-2'])).errors)
+      .toContainEqual(expect.objectContaining({ code: 'ambiguous-unit-id' }))
+    const duplicateAddOns = structuredClone(order)
+    duplicateAddOns.items[0].units[1].addons.push({ ...duplicateAddOns.items[0].units[1].addons[0] })
+    expect(validateRefundSelection(duplicateAddOns, makeSelection(['L1-2'], [{ unitId: 'L1-2', addonId: 'A1' }])).errors)
+      .toContainEqual(expect.objectContaining({ code: 'ambiguous-addon-id' }))
   })
 
   it('returns clear errors for unknown units and add-ons', () => {

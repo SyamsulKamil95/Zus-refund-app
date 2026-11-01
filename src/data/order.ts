@@ -38,9 +38,10 @@ function isOrderItem(value: unknown): value is OrderItem {
     value.units.every(isUnit)
 }
 
-function isOrderJson(value: unknown): value is OrderJson {
+export function isOrderJson(value: unknown): value is OrderJson {
   return isRecord(value) &&
     typeof value.order_id === 'string' &&
+    (value.order_date === undefined || (typeof value.order_date === 'string' && Number.isFinite(Date.parse(value.order_date)))) &&
     value.status === 'completed' &&
     value.currency === 'MYR' &&
     isMoney(value.delivery_fee) &&
@@ -54,4 +55,4 @@ if (!isOrderJson(orderJson)) {
 }
 
 // Expose the validated source JSON directly; no order fields are duplicated in the UI layer.
-export const order = orderJson
+export const order: OrderJson = orderJson

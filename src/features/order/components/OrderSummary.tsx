@@ -1,11 +1,12 @@
 import { ArrowDownToLine, CircleHelp, ReceiptText } from 'lucide-react'
+import type { RefObject } from 'react'
 import type { OrderJson } from '../types/order.types'
 import { calculateOrderTotals, formatMoney } from '../utils/orderCalculator'
 import { StatusBadge } from './StatusBadge'
 
-type OrderSummaryProps = { order: OrderJson; onStartRefund: () => void }
+type OrderSummaryProps = { order: OrderJson; onStartRefund: () => void; refundButtonRef?: RefObject<HTMLButtonElement | null> }
 
-export function OrderSummary({ order, onStartRefund }: OrderSummaryProps) {
+export function OrderSummary({ order, onStartRefund, refundButtonRef }: OrderSummaryProps) {
   const totals = calculateOrderTotals(order)
 
   return (
@@ -23,7 +24,7 @@ export function OrderSummary({ order, onStartRefund }: OrderSummaryProps) {
       </div>
       <div className="summary-total-line"><span>Total order amount</span><strong>{formatMoney(totals.total, order.currency)}</strong></div>
       <div className="summary-footnote"><CircleHelp size={14} aria-hidden="true" /><span>Amounts include add-ons at their per-unit prices.</span></div>
-      <button className="refund-button" type="button" onClick={onStartRefund}>
+      <button ref={refundButtonRef} className="refund-button" type="button" onClick={onStartRefund}>
         <ArrowDownToLine size={16} aria-hidden="true" /> Refund
       </button>
     </aside>

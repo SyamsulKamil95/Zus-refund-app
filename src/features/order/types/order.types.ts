@@ -24,6 +24,7 @@ export interface OrderItem {
 
 export interface OrderJson {
   order_id: string
+  order_date?: string
   status: OrderStatus
   currency: OrderCurrency
   delivery_fee: number

@@ -1,10 +1,11 @@
-import { Coffee, ChevronRight, LayoutDashboard } from 'lucide-react'
+import { ChevronRight, LayoutDashboard } from 'lucide-react'
+import zusCoffeeLogo from '../../../assets/images/zus-coffee-logo.png'
 
 export function OrderHeader() {
   return (
     <header className="backoffice-header">
       <a className="backoffice-brand" href="#main-content" aria-label="ZUS Coffee back office home">
-        <span className="backoffice-brand-icon"><Coffee size={19} strokeWidth={2.1} aria-hidden="true" /></span>
+        <img className="backoffice-brand-logo" src={zusCoffeeLogo} alt="ZUS Coffee logo" width={32} height={32} />
         <span>ZUS<span className="brand-subtitle">COFFEE</span></span>
         <span className="brand-divider" aria-hidden="true" />
         <span className="brand-context">Back office</span>
