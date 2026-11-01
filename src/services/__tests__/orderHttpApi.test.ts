@@ -21,6 +21,13 @@ function post(body: unknown = request(), url = endpoint) {
 }
 
 describe('fetch clients and MSW HTTP handlers', () => {
+  it('returns JSON 404 for an unknown API endpoint instead of falling through to an HTML page', async () => {
+    const response = await fetch('http://localhost/api/not-implemented')
+    expect(response.status).toBe(404)
+    expect(response.headers.get('content-type')).toContain('application/json')
+    expect(await response.json()).toMatchObject({ success: false, status: 'error', error: { code: 'ENDPOINT_NOT_FOUND' } })
+  })
+
   it('GET returns HTTP 200 and an isolated copy of the original order', async () => {
     const response = await fetch(endpoint)
     expect(response.status).toBe(200)

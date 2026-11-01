@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { waitFor } from '@testing-library/react'
 
 const { startMockWorker, createRoot, render } = vi.hoisted(() => {
@@ -15,8 +15,11 @@ beforeEach(() => {
   document.body.innerHTML = '<div id="root"></div>'
 })
 
+afterEach(() => vi.unstubAllEnvs())
+
 describe('demo startup', () => {
-  it('waits for the worker before mounting React and starting order loading', async () => {
+  it.each([true, false])('waits for the worker before mounting React when DEV=%s', async (isDevelopment) => {
+    vi.stubEnv('DEV', isDevelopment)
     let ready!: () => void
     startMockWorker.mockImplementation(() => new Promise((resolve) => { ready = resolve }))
     await import('./main')

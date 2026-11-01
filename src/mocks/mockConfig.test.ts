@@ -1,9 +1,24 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createMockControls } from './mockConfig'
+import { createMockControls, showDemoTools } from './mockConfig'
 
 afterEach(() => vi.unstubAllEnvs())
 
 describe('demo mock controls', () => {
+  it.each([true, false])('requires explicit opt-in to show tools when DEV=%s', (isDevelopment) => {
+    vi.stubEnv('DEV', isDevelopment)
+    expect(showDemoTools('')).toBe(false)
+    expect(showDemoTools('?demoTools=0')).toBe(false)
+    expect(showDemoTools('?demoTools=1')).toBe(true)
+  })
+
+  it('does not show mock tools when demo mode is explicitly disabled', async () => {
+    vi.stubEnv('VITE_DEMO_MODE', 'false')
+    vi.resetModules()
+    const config = await import('./mockConfig')
+    expect(config.demoMode).toBe(false)
+    expect(config.showDemoTools('?demoTools=1')).toBe(false)
+  })
+
   it('supports normal and slow latency without submitting requests', () => {
     const controls = createMockControls()
     expect(controls.getSnapshot()).toEqual({ latencyMs: 1000, failNextRefund: false })
