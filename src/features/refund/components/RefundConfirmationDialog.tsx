@@ -1,7 +1,7 @@
 import { useRef, useState, type RefObject } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { LoaderCircle, TriangleAlert } from 'lucide-react'
-import type { OrderApi, RefundApiResponse } from '../../../services/orderApi.types'
+import type { OrderApi, RefundSubmissionResult } from '../../../services/orderApi.types'
 import { formatMoney } from '../../order/utils/orderCalculator'
 import { useRefundSubmission } from '../hooks/useRefundSubmission'
 import { refundChannels, type RefundConfirmationRequest } from '../types/refundFlow.types'
@@ -10,7 +10,7 @@ type RefundConfirmationDialogProps = {
   request: RefundConfirmationRequest
   api: OrderApi
   onCancel: () => void
-  onSuccess: (response: RefundApiResponse) => void
+  onSuccess: (response: RefundSubmissionResult) => void
   returnFocusRef: RefObject<HTMLButtonElement | null>
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { ApiError, type OrderApi, type RefundApiRequest, type RefundApiResponse } from '../../../services/orderApi.types'
+import { ApiError, type OrderApi, type RefundApiRequest, type RefundSubmissionResult } from '../../../services/orderApi.types'
 
-export function useRefundSubmission(api: OrderApi, onSuccess: (response: RefundApiResponse) => void) {
+export function useRefundSubmission(api: OrderApi, onSuccess: (response: RefundSubmissionResult) => void) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const inFlightRef = useRef(false)

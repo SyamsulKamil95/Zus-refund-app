@@ -92,14 +92,33 @@ Submits a refund for selected units, add-ons, and optionally the delivery fee.
 
 **Error responses:**
 
+Failures use a consistent JSON envelope with `success: false`, `status: "error"`, and an error code, message, and details array. Order endpoints include the path's `orderId`; an unknown endpoint without an order context omits it. For example, a simulated HTTP 503 response is:
+
+```json
+{
+  "success": false,
+  "orderId": "ORD-10482",
+  "status": "error",
+  "error": {
+    "code": "SIMULATED_FAILURE",
+    "message": "The refund service is temporarily unavailable. Please try again.",
+    "details": []
+  }
+}
+```
+
 | Status | Description |
 |---|---|
 | 400 | Malformed request |
 | 404 | Order not found |
+| 409 | Another refund is in progress, or a request ID was reused with different input |
 | 422 | Invalid refund selection or previously refunded unit |
+| 500 | Unexpected mock service error |
 | 503 | Simulated service unavailable |
 
-The mock API supports configurable response delays and deterministic failure simulation for testing loading, error handling, and retry behavior.
+The POST success body contains exactly the five fields above. `refundAmount` is a decimal MYR amount calculated from integer sen on the mock server; JSON may serialize `15.90` as `15.9`. Internal receipts, request IDs, and order snapshots are not returned in this body. The response carries `X-Order-Version` separately as an exposed HTTP header. The fetch client validates the body and version header, then returns an internal `{ refund, version }` result to the UI. After success, the UI fetches GET order data and rejects snapshots older than the returned version. GET retains its existing `{ order, version }` response contract.
+
+The mock API supports configurable response delays and deterministic failure simulation for testing loading, error handling, and retry behavior. Validation errors use HTTP 422 with details explaining the invalid selection. Failures preserve the draft and never show success. An identical request ID and payload safely replay the original refund result without another commit; a later request for an already-refunded unit is rejected. Internal receipts and the authoritative order store continue using integer minor units.
 
 ### b) Refund Calculation
 

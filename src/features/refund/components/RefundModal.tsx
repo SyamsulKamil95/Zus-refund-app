@@ -2,7 +2,7 @@ import { useEffect, useReducer, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
 import type { OrderJson } from '../../order/types/order.types'
-import type { OrderApi, RefundApiResponse } from '../../../services/orderApi.types'
+import type { OrderApi, RefundSubmissionResult } from '../../../services/orderApi.types'
 import { createRefundFlowState, refundFlowReducer } from '../state/refundFlowReducer'
 import type { RefundConfirmationRequest } from '../types/refundFlow.types'
 import { calculateRefundTotal, validateRefundSelection } from '../utils/refundCalculator'
@@ -17,7 +17,7 @@ type RefundModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   api: OrderApi
-  onRefundSuccess?: (response: RefundApiResponse) => void
+  onRefundSuccess?: (response: RefundSubmissionResult) => void
   onRequestConfirmation?: (request: RefundConfirmationRequest) => void
 }
 
@@ -33,7 +33,7 @@ export function RefundModal({ order, open, onOpenChange, onRequestConfirmation, 
 }
 
 // Mounting a new flow on each opening resets drafts for every close mechanism.
-function RefundFlow({ order, api, onRequestConfirmation, onSuccess }: Pick<RefundModalProps, 'order' | 'api' | 'onRequestConfirmation'> & { onSuccess: (response: RefundApiResponse) => void }) {
+function RefundFlow({ order, api, onRequestConfirmation, onSuccess }: Pick<RefundModalProps, 'order' | 'api' | 'onRequestConfirmation'> & { onSuccess: (response: RefundSubmissionResult) => void }) {
   const [state, dispatch] = useReducer(refundFlowReducer, undefined, createRefundFlowState)
   const [confirmationRequest, setConfirmationRequest] = useState<RefundConfirmationRequest | null>(null)
   const reviewConfirmRef = useRef<HTMLButtonElement>(null)

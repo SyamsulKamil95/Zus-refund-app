@@ -33,7 +33,11 @@ describe('fetch clients and MSW HTTP handlers', () => {
 
   it('GET and POST return HTTP 404 for unknown orders', async () => {
     expect((await fetch('http://localhost/api/orders/INVALID')).status).toBe(404)
-    expect((await post(request({ orderId: 'INVALID' }), 'http://localhost/api/orders/INVALID')).status).toBe(404)
+    const response = await post(request({ orderId: 'INVALID' }), 'http://localhost/api/orders/INVALID')
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({ success: false, orderId: 'INVALID', status: 'error', error: {
+      code: 'ORDER_NOT_FOUND', message: 'The order was not found.', details: [],
+    } })
     await expect(api.getOrder('INVALID')).rejects.toMatchObject({ status: 404, code: 'ORDER_NOT_FOUND' })
   })
 
@@ -41,7 +45,8 @@ describe('fetch clients and MSW HTTP handlers', () => {
     const original = structuredClone(order)
     const response = await post({ ...request(), total: { amountMinorUnits: 1, currency: 'USD' } })
     expect(response.status).toBe(201)
-    expect(await response.json()).toMatchObject({ version: 1, refund: { amountMinorUnits: 1840, currency: 'MYR' } })
+    expect(await response.json()).toEqual({ success: true, orderId: order.order_id, refundAmount: 18.4, currency: 'MYR', status: 'success' })
+    expect(response.headers.get('X-Order-Version')).toBe('1')
     const updated = await api.getOrder(order.order_id)
     expect(updated.order.items[1].units[0].status).toBe('refunded')
     expect(updated.order.items[1].units[0].addons.map(({ status }) => status)).toEqual(['refunded', 'paid'])
@@ -51,6 +56,14 @@ describe('fetch clients and MSW HTTP handlers', () => {
     expect(updated.order.delivery_fee_status).toBe('refunded')
     expect(calculateOrderTotals(updated.order).total).toBe(89.3)
     expect(order).toEqual(original)
+  })
+
+  it('returns the requested success contract for the RM15.90 example', async () => {
+    const response = await post(request({ selection: {
+      selectedUnitIds: ['L1-2'], selectedAddOns: [{ unitId: 'L1-2', addonId: 'A1' }], includeDeliveryFee: false,
+    } }))
+    expect(response.status).toBe(201)
+    expect(await response.json()).toEqual({ success: true, orderId: order.order_id, refundAmount: 15.9, currency: 'MYR', status: 'success' })
   })
 
   it.each([
@@ -65,7 +78,7 @@ describe('fetch clients and MSW HTTP handlers', () => {
   ] as const)('returns HTTP 422 for %s without changing the order', async (_label, selectedUnitIds, selectedAddOns) => {
     const response = await post(request({ selection: { selectedUnitIds, selectedAddOns, includeDeliveryFee: false } }))
     expect(response.status).toBe(422)
-    expect(await response.json()).toMatchObject({ error: { code: 'INVALID_REFUND_SELECTION', details: expect.any(Array) } })
+    expect(await response.json()).toMatchObject({ success: false, orderId: order.order_id, status: 'error', error: { code: 'INVALID_REFUND_SELECTION', details: expect.any(Array) } })
     expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })
   })
 
@@ -75,7 +88,11 @@ describe('fetch clients and MSW HTTP handlers', () => {
   })
 
   it('returns HTTP 400 for malformed JSON, invalid structure and path/body mismatch', async () => {
-    expect((await fetch(`${endpoint}/refunds`, { method: 'POST', body: '{' })).status).toBe(400)
+    const malformed = await fetch(`${endpoint}/refunds`, { method: 'POST', body: '{' })
+    expect(malformed.status).toBe(400)
+    expect(await malformed.json()).toEqual({ success: false, orderId: order.order_id, status: 'error', error: {
+      code: 'INVALID_JSON', message: 'The refund request must contain valid JSON.', details: [],
+    } })
     expect((await post(null)).status).toBe(400)
     expect((await post(request({ orderId: 'different' }))).status).toBe(400)
   })
@@ -85,7 +102,20 @@ describe('fetch clients and MSW HTTP handlers', () => {
     await expect(api.postRefund(order.order_id, request())).rejects.toMatchObject({ status: 503, code: 'SIMULATED_FAILURE', message: expect.stringContaining('temporarily unavailable') })
     expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })
     expect(mockRuntime.controls.getSnapshot().failNextRefund).toBe(false)
-    expect((await api.postRefund(order.order_id, request())).refund.amountMinorUnits).toBe(1840)
+    expect(await api.postRefund(order.order_id, request())).toEqual({ version: 1, refund: {
+      success: true, orderId: order.order_id, refundAmount: 18.4, currency: 'MYR', status: 'success',
+    } })
+  })
+
+  it('returns a consistent HTTP 503 error body without changing the order', async () => {
+    mockRuntime.controls.armFailure()
+    const response = await post()
+    expect(response.status).toBe(503)
+    expect(await response.json()).toEqual({ success: false, orderId: order.order_id, status: 'error', error: {
+      code: 'SIMULATED_FAILURE', message: 'The refund service is temporarily unavailable. Please try again.', details: [],
+    } })
+    expect(response.headers.get('X-Order-Version')).toBeNull()
+    expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })
   })
 
   it('returns typed HTTP 422 errors with validation details to the fetch client', async () => {
@@ -102,6 +132,10 @@ describe('fetch clients and MSW HTTP handlers', () => {
     mockRuntime.controls.reset({ latencyMs: 30 })
     const results = await Promise.all([post(), post()])
     expect(results.map(({ status }) => status).sort()).toEqual([201, 409])
+    const conflict = results.find(({ status }) => status === 409)
+    expect(await conflict?.json()).toEqual({ success: false, orderId: order.order_id, status: 'error', error: {
+      code: 'REFUND_IN_PROGRESS', message: 'A refund for this order is already being processed.', details: [],
+    } })
     expect((await api.getOrder(order.order_id)).version).toBe(1)
     expect((await post()).status).toBe(201)
     expect((await api.getOrder(order.order_id)).version).toBe(1)

@@ -6,7 +6,8 @@ import { server } from '../../../mocks/node'
 import { order } from '../../../data/order'
 import { createOrderApi } from '../../../services/orderApi'
 import { mockRuntime } from '../../../mocks/runtime'
-import type { OrderApi, RefundApiResponse } from '../../../services/orderApi.types'
+import { refundHttpResponse } from '../../../mocks/handlers'
+import type { OrderApi, RefundSubmissionResult } from '../../../services/orderApi.types'
 import OrderPage from '../../order/pages/OrderPage'
 import { prepareRefundConfirmation } from '../utils/refundReview'
 import { RefundConfirmationDialog } from '../components/RefundConfirmationDialog'
@@ -37,7 +38,7 @@ describe('refund confirmation and submission workflow', () => {
     const post = vi.fn(async ({ request, params }: { request: Request; params: { orderId?: string | readonly string[] } }) => {
       const body: unknown = await request.json()
       await gate
-      return HttpResponse.json(await mockRuntime.service.postRefund(String(params.orderId), body, { latencyMs: 0 }), { status: 201 })
+      return refundHttpResponse(await mockRuntime.service.postRefund(String(params.orderId), body, { latencyMs: 0 }))
     })
     server.use(http.post('*/api/orders/:orderId/refunds', post))
     const user = userEvent.setup()
@@ -82,7 +83,7 @@ describe('refund confirmation and submission workflow', () => {
   })
 
   it('shows HTTP 422 feedback and retains the review draft without changing the order', async () => {
-    server.use(http.post('*/api/orders/:orderId/refunds', () => HttpResponse.json({ error: {
+    server.use(http.post('*/api/orders/:orderId/refunds', () => HttpResponse.json({ success: false, orderId: order.order_id, status: 'error', error: {
       code: 'INVALID_REFUND_SELECTION', message: 'The selected items are no longer eligible for refund.', details: [],
     } }, { status: 422 })))
     const user = userEvent.setup()
@@ -209,7 +210,7 @@ describe('refund confirmation and submission workflow', () => {
   it('blocks double-click submission and dismissal while a request is pending', async () => {
     const user = userEvent.setup()
     const service = createOrderApi()
-    let resolveRequest!: (response: RefundApiResponse) => void
+    let resolveRequest!: (response: RefundSubmissionResult) => void
     const post = vi.fn<OrderApi['postRefund']>(() => new Promise((resolve) => { resolveRequest = resolve }))
     render(<OrderPage api={{ ...service, postRefund: post }} />)
     const confirmation = await openConfirmation(user)
@@ -286,7 +287,7 @@ describe('refund confirmation and submission workflow', () => {
       selection: { selectedUnitIds: ['L3-1'], selectedAddOns: [], includeDeliveryFee: false }, reason: 'Other', channel: 'in-app-credit',
     })
     if (!preview.isValid) throw new Error('Invalid test draft')
-    let resolveRequest!: (response: RefundApiResponse) => void
+    let resolveRequest!: (response: RefundSubmissionResult) => void
     const post = vi.fn<OrderApi['postRefund']>(() => new Promise((resolve) => { resolveRequest = resolve }))
     const onSuccess = vi.fn()
     const { unmount } = render(<RefundConfirmationDialog request={preview.request} api={{ ...service, postRefund: post }} onCancel={vi.fn()} onSuccess={onSuccess} returnFocusRef={{ current: null }} />)
@@ -294,8 +295,8 @@ describe('refund confirmation and submission workflow', () => {
     const signal = post.mock.calls[0][2]?.signal
     unmount()
     expect(signal?.aborted).toBe(true)
-    await act(async () => resolveRequest({ order: structuredClone(order), version: 1, refund: {
-      refundId: 'test', requestId: 'test', orderId: order.order_id, currency: 'MYR', amountMinorUnits: 790,
+    await act(async () => resolveRequest({ version: 1, refund: {
+      success: true, orderId: order.order_id, currency: 'MYR', refundAmount: 7.9, status: 'success',
     } }))
     expect(onSuccess).not.toHaveBeenCalled()
   })

@@ -1,6 +1,7 @@
 import type { OrderSnapshot } from '../features/order/state/orderStore'
+import type { OrderCurrency } from '../features/order/types/order.types'
 import type { RefundChannel, RefundReason } from '../features/refund/types/refundFlow.types'
-import type { RefundSelection, RefundTotal } from '../features/refund/utils/refundCalculator'
+import type { RefundSelection } from '../features/refund/utils/refundCalculator'
 
 export interface RefundApiRequest {
   requestId: string
@@ -10,14 +11,28 @@ export interface RefundApiRequest {
   channel: RefundChannel
 }
 
-export interface RefundReceipt extends RefundTotal {
-  refundId: string
-  requestId: string
+export interface RefundApiResponse {
+  success: true
   orderId: string
+  refundAmount: number
+  currency: OrderCurrency
+  status: 'success'
 }
 
-export interface RefundApiResponse extends OrderSnapshot {
-  refund: RefundReceipt
+export interface RefundSubmissionResult {
+  refund: RefundApiResponse
+  version: number
+}
+
+export interface ApiErrorResponse {
+  success: false
+  orderId?: string
+  status: 'error'
+  error: {
+    code: string
+    message: string
+    details: string[]
+  }
 }
 
 export interface ApiRequestOptions {
@@ -26,7 +41,7 @@ export interface ApiRequestOptions {
 
 export interface OrderApi {
   getOrder: (orderId: string, options?: ApiRequestOptions) => Promise<OrderSnapshot>
-  postRefund: (orderId: string, request: unknown, options?: ApiRequestOptions) => Promise<RefundApiResponse>
+  postRefund: (orderId: string, request: unknown, options?: ApiRequestOptions) => Promise<RefundSubmissionResult>
 }
 
 export class ApiError extends Error {

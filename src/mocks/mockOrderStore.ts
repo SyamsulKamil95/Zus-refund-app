@@ -1,8 +1,10 @@
 import { createOrderStore } from '../features/order/state/orderStore'
 import type { OrderJson } from '../features/order/types/order.types'
+import type { OrderSnapshot } from '../features/order/state/orderStore'
+import type { RefundTotal } from '../features/refund/utils/refundCalculator'
 import { applyRefund } from '../features/refund/utils/applyRefund'
 import { prepareRefundConfirmation } from '../features/refund/utils/refundReview'
-import { ApiError, type ApiRequestOptions, type OrderApi, type RefundReceipt } from '../services/orderApi.types'
+import { ApiError, type ApiRequestOptions, type OrderApi } from '../services/orderApi.types'
 import { parseRefundRequest, refundRequestFingerprint } from '../services/refundRequest'
 import { delay } from 'msw/utils/delay'
 
@@ -11,9 +13,19 @@ interface MockRequestOptions extends ApiRequestOptions {
   latencyMs?: number
 }
 
+interface RefundReceipt extends RefundTotal {
+  refundId: string
+  requestId: string
+  orderId: string
+}
+
+export interface MockRefundResult extends OrderSnapshot {
+  refund: RefundReceipt
+}
+
 export interface MockOrderService {
   getOrder: (orderId: string, options?: MockRequestOptions) => ReturnType<OrderApi['getOrder']>
-  postRefund: (orderId: string, request: unknown, options?: MockRequestOptions) => ReturnType<OrderApi['postRefund']>
+  postRefund: (orderId: string, request: unknown, options?: MockRequestOptions) => Promise<MockRefundResult>
 }
 
 function waitForNetwork(latencyMs: number, signal?: AbortSignal): Promise<void> {

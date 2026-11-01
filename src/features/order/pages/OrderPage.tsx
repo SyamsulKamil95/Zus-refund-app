@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { order as orderReference } from '../../../data/order'
 import { createOrderApi } from '../../../services/orderApi'
-import type { OrderApi, RefundApiResponse } from '../../../services/orderApi.types'
+import type { OrderApi, RefundSubmissionResult } from '../../../services/orderApi.types'
 import { DemoToolsPanel } from '../../../mocks/DemoToolsPanel'
 import { showDemoTools } from '../../../mocks/mockConfig'
 import { RefundModal } from '../../refund/components/RefundModal'
@@ -27,10 +27,10 @@ export default function OrderPage({ api: providedApi }: { api?: OrderApi }) {
     }
   }, [order, isLoading, loadError])
 
-  function handleRefundSuccess(response: RefundApiResponse) {
+  function handleRefundSuccess(response: RefundSubmissionResult) {
     restoreFocusRef.current = true
     reload(response.version)
-    setSuccessMessage(`Refund of ${formatMoney(response.refund.amountMinorUnits / 100, response.refund.currency)} completed successfully.`)
+    setSuccessMessage(`Refund of ${formatMoney(response.refund.refundAmount, response.refund.currency)} completed successfully.`)
   }
 
   return (

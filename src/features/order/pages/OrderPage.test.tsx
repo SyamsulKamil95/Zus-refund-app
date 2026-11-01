@@ -31,7 +31,7 @@ describe('OrderPage', () => {
   it('shows a GET error and retries loading without displaying source data as a fallback', async () => {
     let shouldFail = true
     server.use(http.get('*/api/orders/:orderId', () => {
-      if (shouldFail) return HttpResponse.json({ error: { code: 'UNAVAILABLE', message: 'Order service unavailable.' } }, { status: 503 })
+      if (shouldFail) return HttpResponse.json({ success: false, orderId: order.order_id, status: 'error', error: { code: 'UNAVAILABLE', message: 'Order service unavailable.', details: [] } }, { status: 503 })
       return HttpResponse.json({ order, version: 0 })
     }))
     const user = userEvent.setup()
