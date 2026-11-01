@@ -2,6 +2,13 @@
 
 A React, TypeScript, and Vite assessment demo for reviewing orders and processing mock refunds. Native `fetch()` requests are intercepted by Mock Service Worker (MSW), so no backend server or payment service is required.
 
+**Tech stack:** React, TypeScript, Vite, Tailwind CSS v4, Radix UI, Lucide React, native fetch, MSW, Vitest, and React Testing Library.
+
+## Live Demo
+
+[View Live Application](https://zus-refund-app-assessment.vercel.app)
+[View Live Application (API Demo tools)](https://zus-refund-app-assessment.vercel.app/?demoTools=1)
+
 ## Contents
 
 - [Run locally](#run-locally)
@@ -12,7 +19,7 @@ A React, TypeScript, and Vite assessment demo for reviewing orders and processin
 
 ### 1. Prerequisites and installation
 
-- Install **Node.js 22.12.0 or later** and npm.
+- Install **Node.js 24.x** and npm. `package.json` pins this major version so Vercel builds use the same Node major as local verification.
 - Clone or download this repository, then open a terminal in the project root (the folder containing `package.json`).
 
 Install the dependencies using the committed lockfile:
@@ -59,7 +66,7 @@ To test failure and retry:
 
 The failure setting is consumed once, and subsequent requests return to normal latency. To test a successful slow response, select **Slow response** and leave the failure checkbox unchecked. Open browser DevTools → **Network → Fetch/XHR** to inspect the GET order and POST refund requests and their JSON responses.
 
-**Current visibility rule:** the panel requires both development mode and `?demoTools=1`. It is hidden without the parameter and is unavailable in production preview, even if the parameter is present. Reloading the app resets the in-memory mock order and scenarios; to retry a failed refund while preserving its draft, use the dialog instead of reloading.
+**Visibility rule:** the panel requires demo mode and `?demoTools=1`. It is hidden by default in development, production preview, and the deployed assessment demo. The parameter enables it in all three environments. Reloading the app resets the in-memory mock order and scenarios; to retry a failed refund while preserving its draft, use the dialog instead of reloading.
 
 ### 4. Build and run production preview
 
