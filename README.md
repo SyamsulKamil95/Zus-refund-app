@@ -16,7 +16,7 @@ Retrieves order details, including purchased items, individual units, add-ons, p
 ```json
 {
   "order_id": "ORD-10482",
-  "order_date": "2026-10-30T05:00:00.000Z", // New data field added to give more details on the order and necessary in the real world example,
+  "order_date": "2026-10-30T05:00:00.000Z", // New data field added to give more details on the order and necessary in the real world example
   "status": "completed",
   "currency": "MYR",
   "delivery_fee": 5.00,
@@ -60,16 +60,22 @@ Submits a refund for selected units, add-ons, and optionally the delivery fee.
 **Example request body:**
 ```json
 {
-  "orderId": "ORD-10482",
-  "selectedUnits": [
-    {
-      "unitId": "L1-2",
-      "addonIds": ["A1"]
-    }
-  ],
-  "includeDeliveryFee": false,
-  "reason": "Wrong item",
-  "channel": "original_payment_method"
+    "requestId": "1bf271e8-9776-44ae-88ad-acfdd537b425",
+    "orderId": "ORD-10482",
+    "selection": {
+        "selectedUnitIds": [
+            "L1-2"
+        ],
+        "selectedAddOns": [
+            {
+                "unitId": "L1-2",
+                "addonId": "A1"
+            }
+        ],
+        "includeDeliveryFee": false
+    },
+    "reason": "Wrong item",
+    "channel": "in-app-credit"
 }
 ```
 
