@@ -2,6 +2,12 @@
 
 A React, TypeScript, and Vite assessment demo for reviewing orders and processing mock refunds. Native `fetch()` requests are intercepted by Mock Service Worker (MSW), so no backend server or payment service is required.
 
+## Contents
+
+- [Run locally](#run-locally)
+- [Technical Design & Considerations](#technical-design--considerations)
+- [Application Screenshots](#application-screenshots)
+
 ## Run locally
 
 ### 1. Prerequisites and installation
@@ -289,3 +295,31 @@ Radix UI provides accessible interaction primitives, while Tailwind CSS enables 
 5. Add automated end-to-end tests using Playwright.
 6. Improve observability, API monitoring, and error reporting.
 7. Expand coverage for additional refund scenarios and edge cases.
+
+## Application Screenshots
+
+The following screens show the order details and the three stages of the refund workflow.
+
+### Order Details Page
+
+Order information, product images, individual unit and add-on payment statuses, and the historical order total.
+
+![ZUS Order Details Page for ORD-10482 showing product images, paid and refunded unit statuses, and the order summary](docs/screenshots/order-details.png)
+
+### Refund Selection Modal
+
+Unit-level selection with disabled refunded units, add-on eligibility guidance, and a running refund total.
+
+![Refund selection modal showing individual units, disabled refunded items, add-on eligibility, and the refund total](docs/screenshots/refund-selection.png)
+
+### Refund Review Step
+
+A review of the selected unit and its price, with the required refund reason and refund channel.
+
+![Refund review step showing the selected unit, refund reason dropdown, In-app credit channel, and calculated refund total](docs/screenshots/refund-review.png)
+
+### Refund Confirmation Dialog
+
+The final confirmation shows the order ID, refund amount, reason, channel, and submission warning.
+
+![Refund confirmation dialog displaying the order ID, refund amount, reason, channel, and warning before submission](docs/screenshots/refund-confirmation.png)
