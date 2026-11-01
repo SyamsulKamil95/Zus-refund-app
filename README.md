@@ -297,7 +297,7 @@ Radix UI provides accessible interaction primitives, while Tailwind CSS enables 
 
 1. Integrate real backend APIs and persist refunds in a database.
 2. Add backend authorization and audit logging for refund operations.
-3. Introduce idempotency keys to safely handle repeated payment requests.
+3. Back the existing request-id idempotency behavior with durable server-side storage for real payment requests.
 4. Support refund transaction history and detailed refund statuses.
 5. Add automated end-to-end tests using Playwright.
 6. Improve observability, API monitoring, and error reporting.
