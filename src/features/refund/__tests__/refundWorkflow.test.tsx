@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { http, HttpResponse } from 'msw/http'
 import { server } from '../../../mocks/node'
 import { order } from '../../../data/order'
@@ -11,6 +11,10 @@ import type { OrderApi, RefundSubmissionResult } from '../../../services/orderAp
 import OrderPage from '../../order/pages/OrderPage'
 import { prepareRefundConfirmation } from '../utils/refundReview'
 import { RefundConfirmationDialog } from '../components/RefundConfirmationDialog'
+
+beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+})
 
 async function openConfirmation(user: ReturnType<typeof userEvent.setup>, includeDelivery = true) {
   await user.click(await screen.findByRole('button', { name: 'Refund' }))
@@ -51,6 +55,7 @@ describe('refund confirmation and submission workflow', () => {
     expect(confirmation).toHaveFocus()
     expect(within(confirmation).getByRole('button', { name: 'Cancel' })).toBeDisabled()
     expect(screen.queryByText(/completed successfully/)).not.toBeInTheDocument()
+    expect(window.scrollTo).not.toHaveBeenCalled()
     expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })
     await user.keyboard('{Escape}')
     expect(confirmation).toBeInTheDocument()
@@ -58,6 +63,7 @@ describe('refund confirmation and submission workflow', () => {
     await screen.findByRole('button', { name: 'Refund' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/RM\s*18\.40/)
+    expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith({ top: 0, left: 0, behavior: 'instant' })
     expect(post).toHaveBeenCalledTimes(1)
     expect((await api.getOrder(order.order_id)).version).toBe(1)
   })
@@ -177,6 +183,7 @@ describe('refund confirmation and submission workflow', () => {
     let confirmation = await openConfirmation(user)
     await user.click(within(confirmation).getByRole('button', { name: 'Confirm Refund' }))
     expect(await within(confirmation).findByRole('alert')).toHaveTextContent('temporarily unavailable')
+    expect(window.scrollTo).not.toHaveBeenCalled()
     expect(within(confirmation).getByRole('button', { name: 'Confirm Refund' })).toBeEnabled()
     expect(within(confirmation).queryByRole('checkbox')).not.toBeInTheDocument()
     expect(await api.getOrder(order.order_id)).toEqual({ order, version: 0 })
@@ -201,6 +208,7 @@ describe('refund confirmation and submission workflow', () => {
     await screen.findByRole('button', { name: 'Refund' })
     expect(screen.getByRole('status')).toHaveTextContent(/RM\s*18\.40/)
     const updated = await api.getOrder(order.order_id)
+    expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith({ top: 0, left: 0, behavior: 'instant' })
     expect(updated.version).toBe(1)
     expect(updated.order.items[1].units[0].status).toBe('refunded')
     expect(updated.order.items[1].units[0].addons.map(({ status }) => status)).toEqual(['refunded', 'paid'])

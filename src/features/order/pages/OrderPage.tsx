@@ -21,9 +21,15 @@ export default function OrderPage({ api: providedApi }: { api?: OrderApi }) {
   const restoreFocusRef = useRef(false)
 
   useEffect(() => {
+    if (successMessage && !isRefundModalOpen) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
+  }, [successMessage, isRefundModalOpen])
+
+  useEffect(() => {
     if (restoreFocusRef.current && !isLoading) {
-      if (loadError) retryButtonRef.current?.focus()
-      else if (order) { refundButtonRef.current?.focus(); restoreFocusRef.current = false }
+      if (loadError) retryButtonRef.current?.focus({ preventScroll: true })
+      else if (order) { refundButtonRef.current?.focus({ preventScroll: true }); restoreFocusRef.current = false }
     }
   }, [order, isLoading, loadError])
 

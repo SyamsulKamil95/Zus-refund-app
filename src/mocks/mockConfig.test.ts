@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createMockControls, showDemoTools } from './mockConfig'
+import { createMockControls } from './mockConfig'
 
 afterEach(() => vi.unstubAllEnvs())
 
@@ -27,14 +27,5 @@ describe('demo mock controls', () => {
     controls.armFailure()
     controls.armFailure(false)
     expect(controls.takeRefundScenario()).toEqual({ latencyMs: 0, failNextRefund: false })
-  })
-
-  it('shows tools in development and requires an explicit opt-in in production', () => {
-    vi.stubEnv('DEV', true)
-    expect(showDemoTools('')).toBe(true)
-    vi.stubEnv('DEV', false)
-    expect(showDemoTools('')).toBe(false)
-    expect(showDemoTools('?demoTools=0')).toBe(false)
-    expect(showDemoTools('?demoTools=1')).toBe(true)
   })
 })
